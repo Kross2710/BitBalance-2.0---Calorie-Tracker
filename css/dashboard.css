@@ -1,0 +1,2526 @@
+/* =========================================
+   2. GLOBAL LAYOUT & UTILITIES
+   ========================================= */
+
+/* Main Dashboard Container */
+main.dashboard {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    margin-top: 20px;
+    margin-left: 220px;
+    margin-right: 220px;
+    width: calc(100% - 440px);
+    min-height: 80vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    /* Aligns all columns to the height of the tallest column */
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.flex {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 300px;
+    min-width: 0;
+    gap: 20px;
+    /* Ensure the column itself fills the height provided by the row */
+    height: auto;
+}
+
+/* This targets the last widget in every column (Weather, Info Table, History Chart) 
+   and forces it to grow to fill any remaining empty space. */
+.flex>section:last-child {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Pushes content inside the card apart if needed */
+}
+
+/* Common Card Style */
+.dashboard-card,
+.progress-widget,
+.status-section,
+.chart-section {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    margin: 0;
+}
+
+/* Headings */
+h3,
+h4 {
+    color: var(--text-main);
+    margin-bottom: 15px;
+}
+
+/* =========================================
+   3. COMPONENT SPECIFIC STYLES
+   ========================================= */
+
+/* --- Progress Widget --- */
+.progress-card h3 {
+    font-size: 1.3em;
+}
+
+.progress-value {
+    margin: 8px 0;
+}
+
+.progress-value span {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.progress-value span.ongoing {
+    color: var(--success-color);
+}
+
+.progress-value span.overlimit {
+    color: var(--error-color);
+}
+
+.progress-value span.unset {
+    color: var(--text-muted);
+}
+
+.progress-bar {
+    height: 25px;
+    background-color: var(--progress-bg);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    background-color: var(--progress-fill);
+    height: 100%;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: width;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* --- Status Section --- */
+.status-section span.ongoing {
+    color: var(--success-color);
+}
+
+.status-section span.overlimit {
+    color: var(--error-color);
+}
+
+.status-section span.unset {
+    color: var(--text-muted);
+}
+
+.status-section p {
+    color: var(--text-secondary);
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* --- Alerts --- */
+.error-message,
+.success-message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.error-message {
+    background-color: var(--error-bg);
+    color: var(--error-color);
+    border: 1px solid var(--error-border);
+}
+
+.success-message {
+    background-color: var(--success-bg);
+    color: var(--success-color);
+    border: 1px solid var(--success-border);
+}
+
+/* --- Charts --- */
+.chart-section {
+    text-align: center;
+}
+
+.chart-section canvas {
+    max-width: 100%;
+    height: auto !important;
+    margin-bottom: 10px;
+}
+
+.average-calories {
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+/* --- Specific Chart Sizing --- */
+#mealCategoriesChart {
+    max-width: 80% !important;
+    /* Limit width to 80% */
+    margin: 0 auto;
+    /* Center the chart */
+    display: block;
+}
+
+.chart-section {
+    /* Change from space-between to flex-start (push to top) */
+    justify-content: flex-start !important;
+
+    /* Add spacing between donut chart and table */
+    gap: 30px;
+}
+
+/* Table container adjustments */
+.chart-section .info-section {
+    margin-top: 0 !important;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+}
+
+/* --- Meals Table --- */
+table.meals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    /* Table takes remaining height in its container */
+    height: 100%;
+}
+
+.meals-table th,
+.meals-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.meals-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: transparent;
+}
+
+.meals-table tr:hover {
+    background-color: var(--bg-hover);
+}
+
+.meals-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Streak Widget --- */
+.streak-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.streak-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--bg-hover);
+    /* Subtle background for stats */
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.streak-count {
+    color: var(--success-color);
+}
+
+.longest-streak-count {
+    color: var(--error-color);
+}
+
+.stat-divider {
+    width: 1px;
+    height: 30px;
+    background-color: var(--border-color);
+}
+
+.streak-message {
+    text-align: center;
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* =========================================
+   4. ANIMATIONS
+   ========================================= */
+.fire-icon {
+    display: inline-block;
+    font-size: 1.6rem;
+    margin-left: 8px;
+    transform-origin: center bottom;
+    animation: flicker 1s infinite ease-in-out alternate;
+    text-shadow: 0 0 6px rgba(255, 102, 0, 0.8),
+        0 0 12px rgba(255, 140, 0, 0.6);
+}
+
+@keyframes flicker {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(-2deg);
+        opacity: 0.9;
+    }
+
+    50% {
+        transform: scale(1.15) rotate(2deg);
+        opacity: 1;
+    }
+}
+
+.fire-icon.paused {
+    animation-play-state: paused;
+}
+
+/* =========================================
+   5. RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 1200px) {
+    main.dashboard {
+        width: 90%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+}
+
+@media (max-width: 900px) {
+    main.dashboard {
+        width: 100vw;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .flex-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .flex {
+        width: 100%;
+    }
+
+    .flex>section:last-child {
+        flex-grow: 0;
+        /* Don't stretch on mobile */
+    }
+
+    .progress-widget,
+    .status-section,
+    .chart-section,
+    .info-section,
+    .streak-box {
+        padding: 15px;
+        width: 100%;
+    }
+
+    /* Mobile Table */
+    .meals-table thead {
+        display: none;
+    }
+
+    .meals-table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .meals-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--border-color);
+        text-align: right;
+    }
+
+    .meals-table td:last-child {
+        border-bottom: none;
+    }
+
+    .meals-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-align: left;
+    }
+}
+
+/* --- Macro Widget Styles --- */
+.macro-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.macro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.macro-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.macro-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.macro-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.label-val {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Thanh Bar nền */
+.macro-bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: var(--progress-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Animation fill */
+.macro-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+/* Màu sắc từng loại Macro (Dopamine visual) */
+.protein-fill {
+    background-color: #ff6b6b;
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+}
+
+/* Red */
+.carbs-fill {
+    background-color: #4ecdc4;
+    box-shadow: 0 0 8px rgba(78, 205, 196, 0.4);
+}
+
+/* Cyan */
+.fat-fill {
+    background-color: #ffe66d;
+    box-shadow: 0 0 8px rgba(255, 230, 109, 0.4);
+}
+
+/* Yellow */
+
+.macro-tip {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* --- STREAK CARD SPECIAL STYLING --- */
+
+/* 1. Nền Gradient cho toàn bộ thẻ (Giữ nguyên cái bạn đang có) */
+.streak-card {
+    background: linear-gradient(135deg, #ff9966, #ff5e62);
+    border: none;
+    /* Bỏ viền xám mặc định */
+    box-shadow: 0 10px 20px rgba(255, 94, 98, 0.3);
+    /* Bóng đổ màu cam nhẹ */
+    color: white;
+    /* Mặc định chữ màu trắng cho tiêu đề và footer */
+}
+
+/* 2. Tiêu đề "Streak" và icon Lửa */
+.streak-card h3 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Bóng chữ nhẹ cho dễ đọc */
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.fire-icon {
+    filter: drop-shadow(0 0 8px rgba(255, 235, 59, 0.8));
+    /* Làm lửa phát sáng */
+    font-size: 1.8rem;
+}
+
+/* 3. Hộp thống kê (Cái hộp màu trắng ở giữa) */
+.streak-card .streak-stats {
+    background: #ffffff !important;
+    /* Nền trắng tuyệt đối */
+    border-radius: 12px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    /* Bóng đổ để hộp nổi lên */
+    margin-bottom: 20px;
+}
+
+/* 4. Nhãn "Current" và "Longest" (QUAN TRỌNG: Đổi sang màu xám để hiện rõ trên nền trắng) */
+.streak-card .stat-label {
+    color: #888888 !important;
+    /* Màu xám trung tính */
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+/* 5. Con số (1 và 4) */
+.streak-card .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* Màu số Current Streak (Xanh lá đậm cho dễ đọc) */
+.streak-card .streak-count {
+    color: #2ecc71 !important;
+}
+
+/* Màu số Longest Streak (Đỏ cam đậm hoặc Vàng) */
+.streak-card .longest-streak-count {
+    color: #e74c3c !important;
+}
+
+/* Đường kẻ giữa 2 số */
+.streak-card .stat-divider {
+    background-color: #eeeeee !important;
+    /* Màu xám nhạt */
+    width: 2px;
+}
+
+/* 6. Dòng thông báo bên dưới cùng */
+.streak-card .streak-message {
+    color: rgba(255, 255, 255, 0.95) !important;
+    /* Trắng nhưng dịu mắt chút */
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.progress-widget {
+    /* Thêm !important để chắc chắn màu Gradient đè được màu trắng cũ */
+    background: linear-gradient(135deg, #11998e, #38ef7d) !important;
+    border: none !important;
+    box-shadow: 0 10px 20px rgba(56, 239, 125, 0.3) !important;
+}
+
+/* QUAN TRỌNG: Làm trong suốt thẻ con để nhìn thấy nền Gradient bên dưới */
+.progress-widget .progress-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    /* Xóa padding thừa nếu có */
+}
+
+/* Các phần text bên trong */
+.progress-widget h3 {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+    /* Căn chỉnh lại khoảng cách */
+}
+
+.progress-widget .progress-value span {
+    color: white !important;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-widget .progress-labels span {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 600;
+}
+
+/* Thanh Progress Bar */
+.progress-widget .progress-bar {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    /* Nền mờ */
+}
+
+.progress-widget .progress-fill {
+    background-color: #ffffff !important;
+    /* Thanh chạy màu trắng */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* --- STATUS SECTION STYLING --- */
+
+.status-section {
+    position: relative;
+    /* Để định vị icon nền */
+    overflow: hidden;
+    /* Cắt phần icon nền bị thừa ra ngoài */
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 180px;
+    /* Đảm bảo độ cao đồng đều */
+}
+
+/* 1. Icon nền (Watermark) - Tạo độ sâu */
+.status-bg-icon {
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    font-size: 8rem;
+    /* Icon siêu to */
+    opacity: 0.08;
+    /* Rất mờ */
+    transform: rotate(-15deg);
+    /* Nghiêng một chút cho nghệ */
+    pointer-events: none;
+    /* Không chặn click chuột */
+    color: var(--text-main);
+    transition: all 0.5s ease;
+}
+
+/* Hiệu ứng hover cho thẻ: Icon nền bay lên chút */
+.status-section:hover .status-bg-icon {
+    transform: rotate(0deg) scale(1.1);
+    opacity: 0.12;
+}
+
+/* 2. Nội dung chính */
+.status-content {
+    position: relative;
+    z-index: 2;
+    /* Nổi lên trên icon nền */
+    padding: 10px 5px;
+}
+
+/* 3. Badges (Nhãn trạng thái) */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-blue {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge-gold {
+    background: #fff8e1;
+    color: #fbc02d;
+}
+
+.badge-gray {
+    background: #f5f5f5;
+    color: #616161;
+}
+
+/* Icon xoay cho trạng thái Ongoing */
+.spin {
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 4. Message Text */
+.status-message {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 15px 0 20px 0;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* 5. Nút bấm Action (Thay thế nút cũ) */
+.btn-action {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    /* Bo tròn kiểu Pill */
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(74, 126, 227, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(74, 126, 227, 0.4);
+}
+
+/* Nút Pulse (cho trạng thái Unset để kêu gọi hành động) */
+.btn-pulse {
+    animation: pulse-shadow 2s infinite;
+}
+
+@keyframes pulse-shadow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 126, 227, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(74, 126, 227, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(74, 126, 227, 0);
+    }
+}
+
+/* 6. Alert Box (Success/Error) gọn gàng hơn */
+.alert-box {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-box.error {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.alert-box.success {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+/* --- HISTORY CHART CARD STYLING --- */
+
+.history-card {
+    /* Nền trắng, bo góc, bóng đổ êm */
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header hàng ngang: Tiêu đề bên trái, Avg bên phải */
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.history-card h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-card h4 i {
+    color: #4facfe;
+    /* Icon màu xanh dương */
+}
+
+/* Badge hiển thị số trung bình */
+.chart-average-badge {
+    background: #f0f9ff;
+    /* Nền xanh siêu nhạt */
+    color: #0288d1;
+    /* Chữ xanh đậm */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.chart-average-badge .value {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-left: 4px;
+}
+
+.chart-average-badge .unit {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Wrapper để chart responsive tốt hơn */
+.chart-container-wrapper {
+    position: relative;
+    height: 200px;
+    /* Chiều cao cố định cho chart đẹp */
+    width: 100%;
+}
+
+/* --- MEALS CARD STYLING --- */
+
+.meals-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    /* Đảm bảo chiều cao cân đối với các cột khác */
+}
+
+/* Header */
+.card-header h4 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Biểu đồ Doughnut */
+.doughnut-container {
+    position: relative;
+    width: 180px;
+    /* Giới hạn kích thước biểu đồ cho gọn */
+    height: 180px;
+    margin: 0 auto 25px auto;
+}
+
+/* Chữ ở giữa biểu đồ (Total Cal) */
+.doughnut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    /* Để chuột xuyên qua không bị chặn tooltip */
+}
+
+.center-val {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.center-label {
+    font-size: 0.85rem;
+    color: #999;
+    text-transform: uppercase;
+}
+
+/* Danh sách món ăn (Thay thế Table) */
+.meal-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 300px;
+    /* Nếu danh sách dài thì cho cuộn */
+    overflow-y: auto;
+    padding-right: 5px;
+    /* Để thanh cuộn không đè nội dung */
+}
+
+/* Scrollbar đẹp cho danh sách */
+.meal-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.meal-list-container::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 4px;
+}
+
+/* Từng dòng món ăn (Card nhỏ) */
+.meal-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    /* Màu nền xám siêu nhạt */
+    transition: transform 0.2s ease, background-color 0.2s;
+}
+
+.meal-item:hover {
+    background-color: #f1f3f5;
+    transform: translateX(5px);
+    /* Hiệu ứng trượt nhẹ khi hover */
+}
+
+/* Icon box vuông bo tròn */
+.meal-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+/* Thông tin tên món */
+.meal-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.meal-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.meal-type {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Số Calo bên phải */
+.meal-calories {
+    text-align: right;
+    color: #2c3e50;
+}
+
+.meal-calories .cal-val {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.meal-calories small {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* --- WIKI CARD STYLING --- */
+.wiki-card {
+    /* Gradient Tím/Indigo sang trọng */
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 160px;
+    /* Đảm bảo chiều cao vừa phải */
+}
+
+/* 1. Icon nền trang trí (Watermark) */
+.wiki-bg-icon {
+    position: absolute;
+    right: -10px;
+    top: -20px;
+    font-size: 7rem;
+    color: white;
+    opacity: 0.1;
+    /* Rất mờ để hòa vào nền */
+    transform: rotate(25deg);
+    pointer-events: none;
+}
+
+/* 2. Header & Badge */
+.wiki-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.wiki-card h3 {
+    color: white !important;
+    font-size: 1.3rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.badge-soon {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(5px);
+    /* Hiệu ứng kính mờ */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 3. Mô tả */
+.wiki-desc {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding-right: 20px;
+    /* Tránh đè lên icon nền */
+}
+
+/* 4. Nút bấm (Disabled Style) */
+.btn-wiki {
+    background: rgba(0, 0, 0, 0.2);
+    /* Nền tối mờ */
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: not-allowed;
+    /* Con trỏ báo hiệu không bấm được */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    transition: all 0.3s ease;
+}
+
+.btn-wiki:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.btn-wiki i {
+    font-size: 0.9rem;
+}
+
+/* Tinh chỉnh cho Dark Mode (Giữ nguyên độ sáng vì gradient đã tối sẵn) */
+[data-theme="dark"] .wiki-card {
+    box-shadow: none;
+    /* Có thể làm tối gradient đi một chút nếu muốn */
+    background: linear-gradient(135deg, #5b6bd6, #633e8a);
+}
+
+/* --- MACRO / NUTRITION TARGETS STYLING --- */
+
+.macro-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    /* Bóng đổ nhẹ, tinh tế */
+    border: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Header */
+.macro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.macro-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.info-icon {
+    color: #bdc3c7;
+    cursor: help;
+    transition: color 0.3s;
+}
+
+.info-icon:hover {
+    color: #7f8c8d;
+}
+
+/* --- WEIGHT CARD STYLING --- */
+
+.weight-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.weight-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.current-weight {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.weight-val {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.weight-unit {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Trend Badge */
+.trend-badge {
+    margin-left: 10px;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transform: translateY(-5px);
+    /* Căn chỉnh vị trí */
+}
+
+.trend-badge.down {
+    background: #e8f5e9;
+    color: #2ecc71;
+}
+
+/* Giảm cân = Xanh (Tốt) */
+.trend-badge.up {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+/* Tăng cân = Đỏ */
+.trend-badge.flat {
+    background: #f5f5f5;
+    color: #999;
+}
+
+/* Nút Add nhỏ */
+.btn-icon-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f3e5f5;
+    /* Nền tím nhạt */
+    color: #9b59b6;
+    /* Icon tím */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-small:hover {
+    background: #9b59b6;
+    color: white;
+    transform: rotate(90deg);
+}
+
+.weight-chart-wrapper {
+    height: 120px;
+    width: 100%;
+}
+
+/* Nút xóa nhỏ gọn trong bảng */
+.btn-delete-icon {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    /* Màu đỏ */
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.btn-delete-icon:hover {
+    background: #ffebee;
+}
+
+/* Scrollbar cho list history nếu dài quá */
+.history-list-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list-wrapper::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+/* Nút Secondary cho header widget (nút List) */
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #e1e4e8;
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    color: var(--primary-color);
+    transform: none;
+    /* Không xoay như nút + */
+}
+
+[data-theme="dark"] .btn-secondary {
+    border-color: #444;
+}
+
+/* --- MODAL STYLING --- */
+
+/* Lớp phủ mờ nền */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    /* Màu đen mờ */
+    backdrop-filter: blur(5px);
+    /* Hiệu ứng kính mờ */
+    z-index: 2000;
+    /* Nằm trên cùng */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Khi modal kích hoạt */
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hộp nội dung Modal */
+.modal-box {
+    background: var(--card-bg);
+    width: 95%;
+    max-width: 480px;
+    /* Tăng chiều rộng từ 400px lên 480px */
+    border-radius: 20px;
+    /* Bo góc mềm mại hơn */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    transform: translateY(20px) scale(0.98);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Hiệu ứng nảy nhẹ */
+    overflow: hidden;
+}
+
+.modal-overlay.active .modal-box {
+    transform: translateY(0) scale(1);
+}
+
+/* Header */
+.modal-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    /* Tiêu đề to hơn */
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.close-modal {
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.close-modal:hover {
+    transform: rotate(90deg);
+    color: #e74c3c;
+}
+
+/* Body */
+.modal-body {
+    padding: 25px;
+}
+
+.modal-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* Footer & Buttons */
+.modal-footer {
+    padding: 15px 25px;
+    background: rgba(0, 0, 0, 0.02);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #f1f1f1;
+}
+
+.btn-save {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-save:hover {
+    filter: brightness(1.1);
+}
+
+/* --- DARK MODE MODAL FIXES --- */
+[data-theme="dark"] .modal-box {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: #404040;
+}
+
+[data-theme="dark"] .modal-footer {
+    background: #343a40;
+}
+
+[data-theme="dark"] .btn-cancel {
+    border-color: #555;
+    color: #ccc;
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+    background: #404040;
+}
+
+/* --- LARGE INPUT STYLING (Cho Modal Goal) --- */
+
+/* 1. Label (Nhãn) */
+.large-input-group {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    /* Căn giữa nhãn */
+}
+
+.large-input-group label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+/* 2. Wrapper (Bao quanh input & icon) */
+.input-wrapper-lg {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 320px;
+    /* Giới hạn chiều rộng để không bị bè ra */
+    margin: 0 auto;
+    /* Căn giữa ô input */
+}
+
+/* 3. Icon (Cái hồng tâm) */
+.input-icon-lg {
+    position: absolute;
+    left: 20px;
+    font-size: 1.8rem;
+    /* Icon to hơn */
+    color: var(--primary-color);
+    opacity: 0.8;
+    z-index: 2;
+    transition: transform 0.2s;
+}
+
+/* 4. Input (Ô nhập liệu chính) */
+.input-wrapper-lg input {
+    width: 100%;
+    /* Padding: Trên/Dưới 15px, Trái 60px (chừa chỗ icon), Phải 15px */
+    padding: 15px 15px 15px 60px;
+
+    font-size: 2.2rem;
+    /* CỠ CHỮ SIÊU TO */
+    font-weight: 800;
+    /* CỰC ĐẬM */
+    color: var(--text-primary);
+
+    border: 2px solid #e1e4e8;
+    border-radius: 16px;
+    /* Bo góc tròn trịa */
+    background-color: #f8f9fa;
+    /* Nền xám nhẹ để nổi bật trên nền trắng Modal */
+
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    /* Bóng đổ trong nhẹ */
+}
+
+/* Hiệu ứng khi bấm vào nhập (Focus) */
+.input-wrapper-lg input:focus {
+    border-color: var(--primary-color);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 5px rgba(74, 126, 227, 0.15);
+    /* Vòng sáng lan tỏa */
+    outline: none;
+    transform: scale(1.02);
+    /* Phóng to nhẹ 1 chút */
+}
+
+/* Khi focus thì icon cũng đậm lên chút */
+.input-wrapper-lg input:focus+.input-icon-lg,
+.input-wrapper-lg:focus-within .input-icon-lg {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* Ẩn nút tăng giảm mặc định xấu xí của input number */
+.input-wrapper-lg input::-webkit-outer-spin-button,
+.input-wrapper-lg input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-wrapper-lg input {
+    -moz-appearance: textfield;
+}
+
+/* --- DARK MODE ADJUSTMENTS --- */
+[data-theme="dark"] .input-wrapper-lg input {
+    background-color: #1f1f1f;
+    /* Nền input tối hơn nền modal */
+    border-color: #444;
+    color: #fff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .input-wrapper-lg input:focus {
+    background-color: #2a2a2a;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 5px rgba(74, 126, 227, 0.25);
+}
+
+/* --- AI Nutrition Card Styles --- */
+.nutri-card {
+    background: #f8f9fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 5px;
+    min-width: 200px;
+}
+
+.nutri-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.nutri-header strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.nutri-cal {
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.nutri-macros {
+    display: flex;
+    gap: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.macro {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.macro.p {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Protein Red */
+.macro.c {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* Carb Blue */
+.macro.f {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+/* Fat Orange */
+
+.nutri-advice {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.btn-add-log {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-add-log:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Dark Mode support */
+[data-theme="dark"] .nutri-card {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+[data-theme="dark"] .btn-add-log {
+    background: #333;
+}
+
+/* --- BUTTON ACTIONS STYLING --- */
+
+/* 1. Nút Edit (Desktop Default) */
+.btn-edit {
+    background: #e3f2fd;
+    /* Nền xanh siêu nhạt */
+    color: #1976d2;
+    /* Icon xanh đậm */
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+    /* Cách nút xóa một chút */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+}
+
+/* Nút Delete (Tinh chỉnh lại chút cho đồng bộ) */
+.btn-delete {
+    background: #ffebee;
+    color: #ef5350;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: #ef5350;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 83, 80, 0.2);
+}
+
+/* --- DARK MODE --- */
+[data-theme="dark"] .btn-edit {
+    background: #1a3b5c;
+    /* Xanh tối */
+    color: #64b5f6;
+    /* Icon sáng */
+}
+
+[data-theme="dark"] .btn-edit:hover {
+    background: #4a7ee3;
+    color: white;
+}
+
+[data-theme="dark"] .btn-delete {
+    background: #4a1e24;
+    /* Đỏ tối */
+    color: #f1aeb5;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* --- MOBILE RESPONSIVE (Quan trọng) --- */
+@media (max-width: 768px) {
+
+    /* Target vào ô chứa nút Action trong bảng */
+    .modern-table tr td:last-child {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* Chia đôi chiều rộng */
+        gap: 10px;
+        /* Khoảng cách giữa 2 nút */
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        /* Đường kẻ ngăn cách với nội dung trên */
+    }
+
+    /* Reset width và height để nút to ra dễ bấm */
+    .btn-edit,
+    .btn-delete {
+        width: 100%;
+        /* Full chiều rộng cột lưới */
+        height: 40px;
+        /* Cao hơn để ngón tay dễ bấm */
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Thêm icon + chữ nếu muốn rõ ràng hơn trên mobile (Optional) */
+    /* Nếu bạn muốn hiện chữ "Edit" bên cạnh icon trên mobile thì dùng ::after */
+}
+
+/* intake css file */
+.dashboard-content {
+    margin-top: 20px;
+    margin-left: 240px;
+    margin-right: 240px;
+    padding: 0 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.intake-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   GLOBAL ACTION BUTTONS (Edit/Delete)
+   ========================================= */
+
+/* 1. Nút Edit (Desktop Default) */
+.btn-edit {
+    background: #e3f2fd;
+    /* Nền xanh siêu nhạt */
+    color: #1976d2;
+    /* Icon xanh đậm */
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+    /* Cách nút xóa một chút */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+}
+
+/* Nút Delete (Tinh chỉnh lại chút cho đồng bộ) */
+.btn-delete {
+    background: #ffebee;
+    color: #ef5350;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: #ef5350;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 83, 80, 0.2);
+}
+
+/* --- DARK MODE --- */
+[data-theme="dark"] .btn-edit {
+    background: #1a3b5c;
+    /* Xanh tối */
+    color: #64b5f6;
+    /* Icon sáng */
+}
+
+[data-theme="dark"] .btn-edit:hover {
+    background: #4a7ee3;
+    color: white;
+}
+
+[data-theme="dark"] .btn-delete {
+    background: #4a1e24;
+    /* Đỏ tối */
+    color: #f1aeb5;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* --- MOBILE RESPONSIVE (Quan trọng) --- */
+@media (max-width: 768px) {
+
+    /* Target vào ô chứa nút Action trong bảng */
+    .modern-table tr td:last-child {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* Chia đôi chiều rộng */
+        gap: 10px;
+        /* Khoảng cách giữa 2 nút */
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        /* Đường kẻ ngăn cách với nội dung trên */
+    }
+
+    /* Reset width và height để nút to ra dễ bấm */
+    .btn-edit,
+    .btn-delete {
+        width: 100%;
+        /* Full chiều rộng cột lưới */
+        height: 40px;
+        /* Cao hơn để ngón tay dễ bấm */
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Thêm icon + chữ nếu muốn rõ ràng hơn trên mobile (Optional) */
+    /* Nếu bạn muốn hiện chữ "Edit" bên cạnh icon trên mobile thì dùng ::after */
+}
+
+
+/* =========================================
+   GLOBAL MODAL STYLES (Edit/Goal/Weight)
+   ========================================= */
+
+.modal,
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    /* Căn giữa dọc (cho flex) */
+    justify-content: center;
+    /* Căn giữa ngang (cho flex) */
+    transition: opacity 0.3s ease;
+}
+
+/* Hỗ trợ cả class .modal-content và .modal-box để tương thích code cũ */
+.modal-content,
+.modal-box {
+    background-color: var(--card-bg);
+    margin: 10% auto;
+    /* Fallback nếu không dùng flex */
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal Header & Body */
+.modal-content h3,
+.modal-box h3 {
+    margin-top: 0;
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+}
+
+.modal-body .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-body label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e1e4e8;
+    background: var(--bg-body);
+    color: var(--text-primary);
+}
+
+/* Modal Footer & Buttons */
+.modal-footer {
+    text-align: right;
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.close-modal {
+    color: var(--text-secondary);
+    float: right;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #e74c3c;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-cancel:hover {
+    background: #f1f1f1;
+}
+
+/* Dark Mode Modal */
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-box {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+}
+
+[data-theme="dark"] .btn-cancel {
+    border-color: #555;
+    color: #ccc;
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+    background: #333;
+}
+
+
+/* =========================================
+   AI CHATBOT WIDGET (Global)
+   ========================================= */
+
+/* --- 1. CHATBOT COMMON STYLES (Cả Desktop & Mobile) --- */
+#ai-widget-container {
+    position: fixed;
+    z-index: 9999;
+}
+
+/* Bong bóng chat */
+.chat-bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #4a7ee3, #764ba2);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(74, 126, 227, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10000;
+}
+
+.chat-bubble:hover {
+    transform: scale(1.1);
+}
+
+.chat-bubble.hidden {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- 2. DESKTOP CHAT WINDOW (Facebook Messenger Style) --- */
+.chat-window {
+    position: fixed;
+    bottom: 100px;
+    /* Nằm trên bong bóng một chút */
+    right: 30px;
+    width: 360px;
+    height: 520px;
+    background: var(--card-bg);
+    /* Theo theme sáng/tối */
+    border-radius: 16px;
+    box-shadow: 0 5px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    /* Hiệu ứng mở từ góc dưới lên */
+    transform-origin: bottom right;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 9999;
+}
+
+.chat-window.active {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Header */
+.chat-header {
+    background: linear-gradient(135deg, #4a7ee3, #764ba2);
+    padding: 12px 15px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-avatar {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #2ecc71;
+    border-radius: 50%;
+}
+
+.close-chat {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Body */
+.chat-body {
+    flex: 1;
+    padding: 15px;
+    background: var(--bg-body);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.bot-message {
+    align-self: flex-start;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-message {
+    align-self: flex-end;
+    background: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px rgba(74, 126, 227, 0.3);
+}
+
+/* Footer */
+.chat-footer {
+    padding: 10px;
+    background: var(--card-bg);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.chat-footer input {
+    flex: 1;
+    border: 1px solid transparent;
+    background: #f0f2f5;
+    padding: 10px 15px;
+    border-radius: 20px;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.chat-footer input:focus {
+    background: white;
+    border-color: var(--primary-color);
+}
+
+.btn-tool,
+.btn-send {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.btn-tool:hover,
+.btn-send:hover {
+    background: rgba(74, 126, 227, 0.1);
+}
+
+/* Nutrition Card Style */
+.nutri-card {
+    background: #f8f9fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 5px;
+    min-width: 220px;
+}
+
+.nutri-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.nutri-cal {
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.nutri-macros {
+    display: flex;
+    gap: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.macro {
+    font-weight: 600;
+}
+
+.macro.p {
+    color: #c62828;
+}
+
+.macro.c {
+    color: #1565c0;
+}
+
+.macro.f {
+    color: #ef6c00;
+}
+
+.btn-add-log {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.btn-add-log:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* --- 3. MOBILE OVERRIDES (Giao diện Native App) --- */
+@media (max-width: 480px) {
+
+    /* Bong bóng trên mobile */
+    .chat-bubble {
+        width: 56px;
+        height: 56px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    /* Cửa sổ chat full màn hình */
+    .chat-window {
+        width: 100% !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        /* Fix lỗi thanh địa chỉ iOS */
+        bottom: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+        transform-origin: bottom center;
+        transform: translateY(100%);
+        /* Trượt từ dưới lên */
+        opacity: 1;
+        /* Luôn visible để trượt */
+    }
+
+    .chat-window.active {
+        transform: translateY(0);
+    }
+
+    /* Chặn cuộn nền khi mở chat */
+    body.chat-open {
+        overflow: hidden !important;
+        position: fixed;
+        width: 100%;
+    }
+
+    .chat-body {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .chat-footer {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+
+    .close-chat {
+        font-size: 1.5rem;
+        padding: 10px;
+    }
+
+    /* Ẩn bong bóng khi chat mở để đỡ vướng */
+    .chat-bubble.hidden-mobile {
+        display: none !important;
+    }
+}
+
+/* Dark Mode */
+[data-theme="dark"] .chat-window,
+[data-theme="dark"] .chat-footer {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+[data-theme="dark"] .chat-footer input {
+    background: #404040;
+    color: white;
+}
+
+[data-theme="dark"] .bot-message {
+    background: #3a3a3a;
+    color: white;
+    border-color: #444;
+}
+
+[data-theme="dark"] .nutri-card {
+    background: #333;
+    border-color: #555;
+}
+
+[data-theme="dark"] .btn-add-log {
+    background: #444;
+}
+
+/* HISTORY STYLES */
+/* =========================================
+   1. ACTION BUTTONS (TABLE - EDIT/DELETE)
+   ========================================= */
+
+/* Căn chỉnh ô chứa nút để chúng nằm ngang */
+.modern-table td:last-child {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Căn phải */
+    gap: 8px; /* Khoảng cách giữa 2 nút */
+    white-space: nowrap;
+}
+
+/* Style chung cho nút hành động hình vuông */
+.btn-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px; /* Bo góc mềm mại hơn */
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng Hover chung: Nổi lên & Bóng đổ */
+.btn-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Hiệu ứng Click */
+.btn-icon:active {
+    transform: scale(0.95);
+}
+
+/* --- Nút Edit (Xanh dương) --- */
+.btn-edit {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+.btn-edit:hover {
+    background-color: #1976d2;
+    color: #ffffff;
+}
+
+/* --- Nút Delete (Đỏ) --- */
+.btn-delete {
+    background-color: #ffebee;
+    color: #ef5350;
+}
+.btn-delete:hover {
+    background-color: #ef5350;
+    color: #ffffff;
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .btn-edit { background: #1a3b5c; color: #64b5f6; }
+[data-theme="dark"] .btn-edit:hover { background: #4a7ee3; color: #fff; }
+
+[data-theme="dark"] .btn-delete { background: #4a1e24; color: #f1aeb5; }
+[data-theme="dark"] .btn-delete:hover { background: #dc3545; color: #fff; }
+
+
+/* =========================================
+   2. CHATBOT ACTION BUTTON (+ Add to Log)
+   ========================================= */
+
+/* Nút trong thẻ Chat */
+.btn-add-log {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 15px;
+    
+    /* Style đường viền nét đứt hoặc solid nhẹ nhàng */
+    border: 1px dashed var(--primary-color);
+    background-color: rgba(74, 126, 227, 0.05);
+    color: var(--primary-color);
+    
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* Căn giữa icon và chữ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Hover vào nút Chat */
+.btn-add-log:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-style: solid; /* Đổi thành viền liền khi hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 126, 227, 0.3);
+}
+
+/* Dark Mode Chat Button */
+[data-theme="dark"] .btn-add-log {
+    background-color: rgba(255,255,255,0.05);
+    border-color: #64b5f6;
+    color: #64b5f6;
+}
+[data-theme="dark"] .btn-add-log:hover {
+    background-color: #64b5f6;
+    color: #121212;
+}
+
+/* =========================================
+   3. MOBILE RESPONSIVE FIX
+   ========================================= */
+@media (max-width: 768px) {
+    /* Trên mobile, ô chứa nút sẽ dãn ra */
+    .modern-table tr td:last-child {
+        display: flex;
+        width: 100%;
+        justify-content: space-between; /* Đẩy 2 nút ra 2 đầu hoặc để flex-end tùy ý */
+        gap: 15px;
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 1px dashed #eee;
+    }
+    
+    /* Nút to ra để dễ bấm ngón tay */
+    .btn-icon {
+        flex: 1; /* Dãn đều 2 nút */
+        height: 44px; /* Chuẩn touch target */
+        border-radius: 12px;
+        font-size: 1.2rem;
+    }
+}

@@ -1,0 +1,1160 @@
+<?php
+require_once __DIR__ . '/../include/init.php';
+require_once __DIR__ . '/handlers/dashboard_data.php';
+require_once __DIR__ . '/../include/handlers/log_attempt.php';
+
+if ($isLoggedIn) {
+    log_attempt($pdo, $user['user_id'], 'view', 'User ' . $user['user_id'] . ' clicked on dashboard food', 'dashboard', null);
+}
+
+$activePage = 'intake';
+$activeHeader = 'dashboard';
+$displayUser = $isLoggedIn ? $user['user_name'] : "Guest";
+
+// Logic trạng thái Goal
+$status = 'Unset';
+$statusClass = 'unset';
+if (!empty($userGoal)) {
+    if ($totalCalories > $userGoal) {
+        $status = 'Overlimit';
+        $statusClass = 'overlimit';
+    } else {
+        $status = 'Ongoing';
+        $statusClass = 'ongoing';
+    }
+}
+
+// Xử lý thông báo lỗi/thành công từ URL
+$error_message = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : '';
+$success_message = isset($_GET['success']) ? htmlspecialchars($_GET['success']) : '';
+?>
+
+<!DOCTYPE html>
+<html lang="en"
+    data-theme="<?php echo isset($_SESSION['user']) ? ($_SESSION['user']['theme_preference'] ?? 'light') : 'light'; ?>">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Food Log | BitBalance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/themes/global.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/b94f65ead2.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <?php
+    include PROJECT_ROOT . 'views/header.php';
+    include PROJECT_ROOT . 'dashboard/views/sidebar.php';
+    ?>
+
+    <?php if ($isLoggedIn): ?>
+        <?php include PROJECT_ROOT . 'dashboard/views/right-sidebar.php'; ?>
+
+        <main class="dashboard-content">
+            <div class="intake-container">
+
+                <section class="progress-widget">
+                    <div class="progress-card-content">
+                        <div class="progress-header">
+                            <h3>Today's Intake</h3>
+                            <span class="status-badge <?php echo $statusClass; ?>"><?php echo $status; ?></span>
+                        </div>
+
+                        <div class="progress-value">
+                            <span id="totalDisplay"><?php echo $totalCalories; ?></span>
+                            <small>calories</small>
+                        </div>
+
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                        </div>
+
+                        <div class="progress-footer">
+                            <span class="goal-label">Goal:
+                                <strong><?php echo $userGoal ? $userGoal : 'Unset'; ?></strong></span>
+                            <span
+                                class="pct-label"><?php echo $userGoal ? round(($totalCalories / $userGoal) * 100) . '%' : '0%'; ?></span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="content-split">
+                    <section class="intake-form-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-plus-circle"></i> Log Food</h3>
+                        </div>
+
+                        <div id="alertPlaceholder">
+                            <?php if (!empty($error_message)): ?>
+                                <div class="alert error"><i class="fas fa-exclamation-triangle"></i>
+                                    <?php echo $error_message; ?></div>
+                            <?php endif; ?>
+                            <?php if (!empty($success_message)): ?>
+                                <div class="alert success"><i class="fas fa-check-circle"></i> <?php echo $success_message; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <form id="intakeForm" action="handlers/process_intake.php" method="POST">
+                            <div class="form-group">
+                                <label for="food_item">Food Name</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-utensils input-icon"></i>
+                                    <input type="text" id="food_item" name="food_item" placeholder="e.g., Pho Bo, Apple..."
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-row-split">
+                                <div class="form-group">
+                                    <label for="calories" id="calorieLabel">Calories</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-bolt input-icon"></i>
+                                        <input type="number" id="calories" name="calories" placeholder="0" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="unit_toggle">Unit</label>
+                                    <div class="select-wrapper">
+                                        <select id="unit_toggle">
+                                            <option value="cal">Cal (kcal)</option>
+                                            <option value="kj">kJ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meal_category">Category</label>
+                                <div class="select-wrapper">
+                                    <select id="meal_category" name="meal_category" required>
+                                        <option value="" disabled selected>Select Category</option>
+                                        <option value="breakfast">Breakfast 🌅</option>
+                                        <option value="lunch">Lunch ☀️</option>
+                                        <option value="dinner">Dinner 🌙</option>
+                                        <option value="snack">Snack 🍪</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- <div class="ai-tip">
+                                <i class="fas fa-robot"></i>
+                                <span>Not sure? Ask <a href="https://chat.openai.com/" target="_blank">ChatGPT</a> to
+                                    estimate.</span>
+                            </div> -->
+                            <div class="ai-tip">
+                                <i class="fas fa-robot"></i>
+                                <span>Not sure? Ask our BitBalance AI</a> to
+                                    estimate.</span>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-check"></i> Log Entry
+                            </button>
+                        </form>
+                    </section>
+
+                    <section class="intake-list-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list-ul"></i> Today's History</h3>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Food Item</th>
+                                        <th>Calories</th>
+                                        <th>Category</th>
+                                        <th>Time</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="intakeTableBody">
+                                    <?php if (empty($intakeLog)): ?>
+                                        <tr id="noIntakeRow">
+                                            <td colspan="5" class="empty-state">
+                                                <i class="fas fa-drumstick-bite"></i> No food logged yet today.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+
+                                    <?php foreach ($intakeLog as $log): ?>
+                                        <tr data-id="<?= $log['intakeLog_id']; ?>">
+                                            <td data-label="Food" class="fw-bold">
+                                                <?= htmlspecialchars($log['food_item']); ?>
+                                            </td>
+                                            <td data-label="Calories" class="text-primary">
+                                                <?= htmlspecialchars($log['calories']); ?> kcal
+                                            </td>
+                                            <td data-label="Category">
+                                                <span class="cat-badge cat-<?= strtolower($log['meal_category']); ?>">
+                                                    <?= htmlspecialchars(ucfirst($log['meal_category'])); ?>
+                                                </span>
+                                            </td>
+                                            <td data-label="Time" class="text-muted"
+                                                data-utc="<?= htmlspecialchars($log['date_intake']); ?>">
+                                                <?= date('H:i', strtotime($log['date_intake'])); ?>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <button type="button" class="btn-delete deleteBtn" title="Delete Entry">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button type="button" class="btn-edit" title="Edit Entry">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <div id="ai-widget-container">
+            <div id="ai-chat-window" class="chat-window">
+                <div class="chat-header">
+                    <div class="header-info">
+                        <div class="ai-avatar"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <h4>BitBalance AI Nutritionist</h4>
+                            <span class="status-dot"></span> <small>Online</small>
+                        </div>
+                    </div>
+                    <button class="close-chat" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="chat-body" id="chatBody">
+                    <div class="message bot-message">
+                        Hello! I can help you estimate calories. 📸 <br>
+                        Give me a food name or upload a photo!
+                    </div>
+                </div>
+
+                <div class="chat-footer">
+                    <button class="btn-tool" title="Upload Photo" onclick="document.getElementById('imgUpload').click()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="imgUpload" accept="image/*" style="display: none;"
+                        onchange="handleImageUpload(this)">
+
+                    <input type="text" id="chatInput" placeholder="Ex: 1 bowl of Pho..." onkeypress="handleEnter(event)">
+
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="ai-bubble" class="chat-bubble">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+        </div>
+        <script>
+            const bubble = document.getElementById('ai-bubble');
+            const chatWindow = document.getElementById('ai-chat-window');
+            const chatBody = document.getElementById('chatBody');
+            const chatInput = document.getElementById('chatInput');
+            let currentImageFile = null;
+
+            // --- 1. LOGIC GIAO DIỆN (UI) ---
+
+            function toggleChat() {
+                const isActive = chatWindow.classList.contains('active');
+
+                if (isActive) {
+                    // ĐÓNG CHAT
+                    chatWindow.classList.remove('active');
+
+                    // Hiện lại bong bóng (Desktop & Mobile)
+                    bubble.classList.remove('hidden');
+                    bubble.classList.remove('hidden-mobile'); // Đảm bảo mobile cũng hiện lại
+
+                    // Mobile: Mở khóa cuộn trang
+                    if (window.innerWidth <= 480) {
+                        document.body.classList.remove('chat-open');
+                    }
+                } else {
+                    // MỞ CHAT
+                    chatWindow.classList.add('active');
+
+                    // Ẩn bong bóng
+                    bubble.classList.add('hidden');
+
+                    // Mobile: Khóa cuộn trang
+                    if (window.innerWidth <= 480) {
+                        document.body.classList.add('chat-open');
+                        bubble.classList.add('hidden-mobile');
+                        scrollToBottom();
+                    }
+
+                    // Focus vào ô nhập liệu (Chỉ Desktop)
+                    setTimeout(() => {
+                        if (window.innerWidth > 480) chatInput.focus();
+                    }, 300);
+                }
+            }
+
+            // Nút đóng chat
+            document.querySelector('.close-chat').onclick = toggleChat;
+
+            // --- 2. LOGIC KÉO THẢ (DRAG) ---
+
+            let isDragging = false;
+            let hasMoved = false;
+            let offset = { x: 0, y: 0 };
+            let startPos = { x: 0, y: 0 }; // Lưu vị trí bắt đầu để tính khoảng cách
+
+            function startDrag(e) {
+                // Nếu bong bóng đang ẩn (đang chat) thì không làm gì
+                if (bubble.classList.contains('hidden')) return;
+
+                isDragging = true;
+                hasMoved = false; // Reset trạng thái
+
+                // Lấy tọa độ chuột/ngón tay
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+
+                startPos = { x: clientX, y: clientY }; // Lưu vị trí gốc
+
+                const rect = bubble.getBoundingClientRect();
+                offset.x = clientX - rect.left;
+                offset.y = clientY - rect.top;
+
+                bubble.style.cursor = 'grabbing';
+            }
+
+            function moveDrag(e) {
+                if (!isDragging) return;
+
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+
+                // --- FIX LỖI Ở ĐÂY: Tính khoảng cách di chuyển ---
+                const moveX = Math.abs(clientX - startPos.x);
+                const moveY = Math.abs(clientY - startPos.y);
+
+                // Chỉ coi là "Kéo" nếu di chuyển quá 5 pixel (chống rung tay)
+                if (moveX > 5 || moveY > 5) {
+                    hasMoved = true;
+                    e.preventDefault(); // Chỉ chặn mặc định khi thực sự kéo
+
+                    let newLeft = clientX - offset.x;
+                    let newTop = clientY - offset.y;
+
+                    const maxX = window.innerWidth - bubble.offsetWidth;
+                    const maxY = window.innerHeight - bubble.offsetHeight;
+
+                    bubble.style.bottom = 'auto';
+                    bubble.style.right = 'auto';
+                    bubble.style.left = `${Math.min(Math.max(0, newLeft), maxX)}px`;
+                    bubble.style.top = `${Math.min(Math.max(0, newTop), maxY)}px`;
+                }
+            }
+
+            function endDrag() {
+                if (isDragging) {
+                    isDragging = false;
+                    bubble.style.cursor = 'pointer';
+
+                    // Nếu chưa di chuyển quá 5px -> Coi là CLICK -> Mở Chat
+                    if (!hasMoved) {
+                        toggleChat();
+                    }
+                }
+            }
+
+            // Mouse Events
+            bubble.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', moveDrag);
+            window.addEventListener('mouseup', endDrag);
+
+            // Touch Events
+            bubble.addEventListener('touchstart', startDrag, { passive: false });
+            window.addEventListener('touchmove', moveDrag, { passive: false });
+            window.addEventListener('touchend', endDrag);
+
+
+            // --- 3. LOGIC CHATBOT API (Giữ nguyên) ---
+
+            function handleEnter(e) {
+                if (e.key === 'Enter') sendMessage();
+            }
+
+            function scrollToBottom() {
+                if (chatBody) {
+                    setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
+                }
+            }
+
+            // Mobile focus fix
+            if (chatInput) {
+                chatInput.addEventListener('focus', scrollToBottom);
+            }
+
+            function handleImageUpload(input) {
+                if (input.files && input.files[0]) {
+                    currentImageFile = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        addMessage(`<img src="${e.target.result}" style="max-width:100px; border-radius:8px; display:block; margin-bottom:5px;"> <em>Image selected. Type a message or hit send.</em>`, 'user');
+                    }
+                    reader.readAsDataURL(currentImageFile);
+                }
+            }
+
+            async function sendMessage() {
+                const text = chatInput.value.trim();
+                if (!text && !currentImageFile) return;
+
+                if (text) addMessage(text, 'user');
+                chatInput.value = '';
+
+                const loadingId = addMessage('<i class="fas fa-robot fa-bounce"></i> Analyzing...', 'bot');
+
+                const formData = new FormData();
+                formData.append('message', text);
+                if (currentImageFile) formData.append('image', currentImageFile);
+
+                try {
+                    const res = await fetch('handlers/ai_chat.php', { method: 'POST', body: formData });
+                    const result = await res.json();
+
+                    const loadingEl = document.getElementById(loadingId);
+                    if (loadingEl) loadingEl.remove();
+
+                    if (result.ok && result.data) {
+                        const info = result.data;
+                        if (info.food_name === null) {
+                            addMessage("I couldn't identify any food. Please try again.", 'bot');
+                        } else {
+                            const cardHtml = `
+                        <div class="nutri-card">
+                            <div class="nutri-header">
+                                <strong>${info.food_name}</strong>
+                                <span class="nutri-cal">${info.calories} kcal</span>
+                            </div>
+                            <div class="nutri-macros">
+                                <span class="macro p">P: ${info.protein}g</span>
+                                <span class="macro c">C: ${info.carbs}g</span>
+                                <span class="macro f">F: ${info.fat}g</span>
+                            </div>
+                            <p class="nutri-advice">${info.short_advice}</p>
+                            <button class="btn-add-log" onclick="autoLogFood('${info.food_name}', ${info.calories})">
+                                <i class="fas fa-plus"></i> Add to Log
+                            </button>
+                        </div>`;
+                            addMessage(cardHtml, 'bot');
+                        }
+                    } else {
+                        addMessage(`Server Error: ${result.error || 'Unknown error'}`, 'bot');
+                    }
+                } catch (err) {
+                    const loadingEl = document.getElementById(loadingId);
+                    if (loadingEl) loadingEl.remove();
+                    addMessage("Network error. Please try again.", 'bot');
+                } finally {
+                    currentImageFile = null;
+                    document.getElementById('imgUpload').value = '';
+                }
+            }
+
+            function addMessage(html, sender) {
+                const div = document.createElement('div');
+                div.className = `message ${sender}-message`;
+                div.id = 'msg-' + Date.now();
+                div.innerHTML = html;
+                chatBody.appendChild(div);
+                scrollToBottom();
+                return div.id;
+            }
+
+            function autoLogFood(name, calories) {
+                document.getElementById('food_item').value = name;
+                document.getElementById('calories').value = calories;
+
+                // Đóng chat để hiện form nếu trên mobile
+                if (window.innerWidth <= 480) {
+                    toggleChat();
+                } else {
+                    // Trên desktop có thể giữ chat mở hoặc đóng tùy ý, ở đây mình đóng cho gọn
+                    toggleChat();
+                }
+
+                // Cuộn tới form
+                setTimeout(() => {
+                    document.querySelector('.intake-form-card').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+
+                // Hiệu ứng nháy form
+                const formCard = document.querySelector('.intake-form-card');
+                formCard.style.transition = "box-shadow 0.5s";
+                formCard.style.boxShadow = "0 0 20px rgba(74, 126, 227, 0.5)";
+                setTimeout(() => { formCard.style.boxShadow = ""; }, 1500);
+            }
+        </script>
+    <?php else: ?>
+        <main class="dashboard-content" style="text-align:center; margin-top:100px;">
+            <h2>Please log in to access your Food Log.</h2>
+            <a href="<?= BASE_URL ?>login.php" class="btn-submit"
+                style="display:inline-block; width:auto; margin-top:20px;">Sign In</a>
+        </main>
+    <?php endif; ?>
+
+    <?php include PROJECT_ROOT . 'views/footer.php'; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animation for progress bar
+            setTimeout(() => {
+                const fill = document.getElementById('progressFill');
+                if (fill) fill.style.width = '<?php echo $progressPercentage; ?>%';
+            }, 100);
+
+            const form = document.getElementById('intakeForm');
+            const body = document.getElementById('intakeTableBody');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const progressFill = document.getElementById('progressFill');
+            const unitToggle = document.getElementById('unit_toggle');
+            const calorieLabel = document.getElementById('calorieLabel');
+            const pctLabel = document.querySelector('.pct-label');
+
+            // Toggle Unit Label
+            if (unitToggle && calorieLabel) {
+                unitToggle.addEventListener('change', () => {
+                    calorieLabel.textContent = unitToggle.value === 'kj' ? 'Kilojoules' : 'Calories';
+                });
+            }
+
+            // --- Form Submit ---
+            if (form) {
+                form.addEventListener('submit', async e => {
+                    e.preventDefault();
+
+                    // Button Loading State
+                    const btn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    btn.disabled = true;
+
+                    const fd = new FormData(form);
+
+                    // Convert kJ -> Cal if needed
+                    if (unitToggle && unitToggle.value === 'kj') {
+                        const kj = parseFloat(fd.get('calories'));
+                        const cal = kj / 4.184;
+                        fd.set('calories', Math.round(cal));
+                    }
+
+                    try {
+                        const res = await fetch(form.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'fetch' },
+                            body: fd
+                        });
+                        const data = await res.json();
+
+                        if (data.ok) {
+                            // Remove empty row if exists
+                            const noRow = document.getElementById('noIntakeRow');
+                            if (noRow) noRow.remove();
+
+                            // Insert new row styling
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data.new_row; // Assuming backend returns <tr>...</tr>
+                            // We need to re-apply the classes/structure if the backend returns old HTML
+                            // But for now, let's assume standard structure, styling is handled by CSS
+                            body.insertAdjacentHTML('afterbegin', data.new_row);
+
+                            // Update Time to Local
+                            const newRow = body.firstElementChild;
+                            const dateCell = newRow.querySelector('td[data-label="Logged At"]'); // Old backend label
+                            // Handle backend returning old data-label
+                            // Better logic: find cell by index or class if backend is rigid
+
+                            // Update Totals
+                            totalDisplay.textContent = data.total;
+                            progressFill.style.width = data.percentage + '%';
+                            if (pctLabel) pctLabel.textContent = Math.round(data.percentage) + '%';
+
+                            form.reset();
+                        } else {
+                            alert(data.error || 'An error occurred');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Connection error');
+                    } finally {
+                        btn.innerHTML = originalBtnText;
+                        btn.disabled = false;
+                    }
+                });
+            }
+
+            // --- Delete Action ---
+            if (body) {
+                body.addEventListener('click', async e => {
+                    const btn = e.target.closest('.deleteBtn');
+                    if (!btn) return;
+
+                    const row = btn.closest('tr');
+                    const id = row.dataset.id;
+                    const fd = new FormData();
+                    fd.append('intake_id', id);
+
+                    try {
+                        const res = await fetch('handlers/delete_intake.php', {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'fetch' },
+                            body: fd
+                        });
+                        const data = await res.json();
+
+                        if (data.ok) {
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+
+                            totalDisplay.textContent = data.total;
+                            progressFill.style.width = data.percentage + '%';
+                            if (pctLabel) pctLabel.textContent = Math.round(data.percentage) + '%';
+
+                            // Show empty state if needed
+                            if (body.children.length <= 1) { // 1 because row is removed after timeout
+                                // Logic to re-add empty row could go here
+                            }
+                        } else {
+                            alert(data.error);
+                        }
+                    } catch (err) {
+                        alert('Connection error');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <?php if ($isLoggedIn): ?>
+        <div id="editIntakeModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" id="closeEditModal">&times;</span>
+                <h3>Edit Intake Entry</h3>
+                <form id="editIntakeForm">
+                    <input type="hidden" id="edit_intake_id" name="intake_id">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit_food_item">Food Name</label>
+                            <input type="text" id="edit_food_item" name="food_item" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_calories">Calories</label>
+                            <input type="number" id="edit_calories" name="calories" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_meal_category">Category</label>
+                            <select id="edit_meal_category" name="meal_category" required>
+                                <option value="">Select Category</option>
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancel" id="cancelEditBtn">Cancel</button>
+                        <button type="submit" class="btn-submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            // --- EDIT MODAL LOGIC ---
+            const editModal = document.getElementById('editIntakeModal');
+            const closeEditBtn = document.getElementById('closeEditModal');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const editForm = document.getElementById('editIntakeForm');
+
+            // Open Modal
+            document.body.addEventListener('click', e => {
+                // Dùng Event Delegation để bắt sự kiện cho cả những nút mới thêm bằng AJAX
+                const btn = e.target.closest('.btn-edit');
+                if (!btn) return;
+
+                const row = btn.closest('tr');
+                const id = row.dataset.id;
+
+                // Lấy dữ liệu từ dòng hiện tại
+                const foodItem = row.querySelector('td[data-label="Food"]').innerText.trim();
+                // Xử lý text calories (vd: "500 kcal" -> lấy 500)
+                const calText = row.querySelector('td[data-label="Calories"]').innerText.trim();
+                const calories = parseInt(calText.replace(/\D/g, ''));
+
+                const catBadge = row.querySelector('td[data-label="Category"] .cat-badge');
+                // Lấy class category để biết value (vd: cat-breakfast -> breakfast)
+                let category = 'breakfast'; // default
+                if (catBadge) {
+                    // Tìm class bắt đầu bằng cat-
+                    catBadge.classList.forEach(cls => {
+                        if (cls.startsWith('cat-') && cls !== 'cat-badge') {
+                            category = cls.replace('cat-', '');
+                        }
+                    });
+                }
+
+                // Fill form
+                document.getElementById('edit_intake_id').value = id;
+                document.getElementById('edit_food_item').value = foodItem;
+                document.getElementById('edit_calories').value = calories;
+                document.getElementById('edit_meal_category').value = category;
+
+                editModal.style.display = 'block';
+            });
+
+            // Close Modal Logic
+            const closeModal = () => { editModal.style.display = 'none'; };
+            closeEditBtn.onclick = closeModal;
+            cancelEditBtn.onclick = closeModal;
+            window.onclick = (event) => { if (event.target == editModal) closeModal(); };
+
+            // Handle Submit Edit Form
+            editForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const fd = new FormData(editForm);
+
+                try {
+                    const res = await fetch('handlers/edit_intake.php', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const data = await res.json();
+
+                    if (data.ok) {
+                        // 1. Cập nhật dòng trong bảng (Table Row)
+                        const row = document.querySelector(`tr[data-id="${data.intake_id || fd.get('intake_id')}"]`);
+                        if (row) {
+                            // Nếu server trả về data mới thì dùng, không thì dùng từ form
+                            const newFood = data.food_item || fd.get('food_item');
+                            const newCal = data.calories || fd.get('calories');
+                            const newCat = data.meal_category || fd.get('meal_category');
+
+                            row.querySelector('td[data-label="Food"]').innerText = newFood;
+                            row.querySelector('td[data-label="Calories"]').innerText = newCal + ' kcal';
+
+                            const catCell = row.querySelector('td[data-label="Category"]');
+                            const newLabel = newCat.charAt(0).toUpperCase() + newCat.slice(1);
+                            catCell.innerHTML = `<span class="cat-badge cat-${newCat}">${newLabel}</span>`;
+
+                            // Flash effect
+                            row.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+                            setTimeout(() => row.style.backgroundColor = '', 500);
+                        }
+
+                        // 2. CẬP NHẬT PROGRESS BAR & TOTAL (Logic mới thêm)
+                        if (data.total_calories !== undefined) {
+                            // Cập nhật số tổng to đùng
+                            const totalDisplay = document.getElementById('totalDisplay');
+                            if (totalDisplay) totalDisplay.innerText = data.total_calories;
+
+                            // Cập nhật thanh chạy
+                            const progressFill = document.getElementById('progressFill');
+                            if (progressFill) progressFill.style.width = data.percentage + '%';
+
+                            // Cập nhật số % nhỏ bên dưới (nếu có)
+                            const pctLabel = document.querySelector('.pct-label');
+                            if (pctLabel) pctLabel.innerText = data.percentage + '%';
+                        }
+
+                        closeModal();
+                    } else {
+                        alert(data.error || 'Update failed');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error connecting to server');
+                }
+            });
+        </script>
+    <?php endif; ?>
+</body>
+
+</html>
+
+<style>
+    /* 3. PROGRESS WIDGET (Gradient Style) */
+    .progress-widget {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        color: white;
+        box-shadow: 0 10px 20px rgba(56, 239, 125, 0.2);
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .progress-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .progress-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 15px;
+    }
+
+    .progress-value small {
+        font-size: 1rem;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .progress-track {
+        background: rgba(255, 255, 255, 0.3);
+        height: 12px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .progress-fill {
+        background: #fff;
+        height: 100%;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        transition: width 0.8s ease-out;
+    }
+
+    .progress-footer {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0.95;
+    }
+
+    /* 4. CONTENT SPLIT (Form & Table) */
+    .content-split {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        /* Form nhỏ bên trái, Bảng to bên phải */
+        gap: 20px;
+    }
+
+    /* Common Card Style */
+    .intake-form-card,
+    .intake-list-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .card-header h3 {
+        margin: 0 0 20px 0;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 5. FORM STYLING */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+    }
+
+    .intake-form-card input,
+    .intake-form-card select {
+        width: 100%;
+        padding: 10px 12px 10px 35px;
+        /* Chừa chỗ cho icon */
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: var(--bg-body);
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+
+    /* Select không có icon wrapper nên chỉnh lại padding */
+    .select-wrapper select {
+        padding-left: 12px;
+    }
+
+    .intake-form-card input:focus,
+    .intake-form-card select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 126, 227, 0.1);
+        background: var(--card-bg);
+    }
+
+    .form-row-split {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 10px;
+    }
+
+    .ai-tip {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    .ai-tip a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    [data-theme="dark"] .ai-tip {
+        background: #343a40;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-submit:hover {
+        filter: brightness(1.1);
+    }
+
+    .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    /* 6. TABLE STYLING */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .modern-table th {
+        text-align: left;
+        padding: 12px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .modern-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+
+    .modern-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .fw-bold {
+        font-weight: 600;
+    }
+
+    .text-primary {
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+
+    .text-muted {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+
+    .cat-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .cat-breakfast {
+        background: #ffebee;
+        color: #ef5350;
+    }
+
+    .cat-lunch {
+        background: #e3f2fd;
+        color: #42a5f5;
+    }
+
+    .cat-dinner {
+        background: #f3e5f5;
+        color: #ab47bc;
+    }
+
+    .cat-snack {
+        background: #fff3e0;
+        color: #ffa726;
+    }
+
+    .btn-delete {
+        background: #ffebee;
+        color: #ef5350;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+        background: #ef5350;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--text-secondary);
+        padding: 30px;
+        font-style: italic;
+    }
+
+    [data-theme="dark"] .modern-table th,
+    [data-theme="dark"] .modern-table td {
+        border-color: #404040;
+    }
+
+    /* 7. RESPONSIVE DESIGN */
+    @media (max-width: 1200px) {
+        .dashboard-content {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        /* Ẩn sidebar thì full width */
+        .content-split {
+            grid-template-columns: 1fr;
+        }
+
+        /* Form lên trên, bảng xuống dưới */
+    }
+
+    @media (max-width: 768px) {
+        .modern-table thead {
+            display: none;
+        }
+
+        .modern-table tr {
+            display: block;
+            margin-bottom: 15px;
+            background: var(--bg-body);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .modern-table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border: none;
+        }
+
+        .modern-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .btn-delete {
+            width: 100%;
+            margin-top: 10px;
+            background: #fff0f0;
+        }
+
+        /* Ô cuối cùng (chứa nút Action) */
+        .modern-table tr td:last-child {
+            display: flex !important; /* Dùng Flexbox thay vì Grid để dễ kiểm soát */
+            flex-direction: row;      /* Xếp ngang */
+            justify-content: flex-end; /* Căn phải (hoặc space-between nếu muốn dãn ra) */
+            gap: 10px;                /* Khoảng cách giữa 2 nút */
+            padding-top: 12px;
+            margin-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1); /* Đường kẻ ngăn cách */
+            width: 100%;
+        }
+
+        /* Style chung cho 2 nút trên mobile */
+        .btn-edit, .btn-delete {
+            width: auto;       /* Để nút tự co giãn theo icon */
+            min-width: 40px;   /* Đảm bảo không quá bé */
+            height: 40px;      /* Cao hơn để dễ bấm */
+            font-size: 1.1rem;
+            margin: 0;         /* Reset margin cũ */
+            flex: 1;           /* Chia đều không gian (mỗi nút 50%) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+</style>
