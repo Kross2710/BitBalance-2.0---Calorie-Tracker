@@ -4,7 +4,19 @@ BitBalance is a modular full-stack web application designed to help users track 
 
 The system integrates AI-powered food image analysis via Gemini API and includes multi-role access control (User/Admin), forum interaction, and product management features.
 
-⚠️ To enable AI functionality, add your own Gemini API key in db_config.php.
+⚠️ To enable AI functionality, create include/secrets.php and add your Gemini API key.
+
+## 🎯 Project Motivation
+
+This system was developed to explore AI-assisted health tracking and demonstrate secure full-stack PHP development using modular architecture.
+
+## 🧠 Technical Highlights
+
+- Secure password hashing (password_hash, password_verify)
+- Modular backend structure
+- Gemini AI API integration with server-side processing
+- Dynamic chart rendering using JavaScript
+- Secure PDO prepared statements
 
 ---
 
@@ -20,11 +32,42 @@ Database communication is handled using PDO with prepared statements to prevent 
 
 # 🏗 Architecture Design
 
-The application follows a structured backend approach:
-	•	Separation of authentication, business logic, and database operations
-	•	Modular file organization for maintainability
-	•	Relational database schema with clear entity relationships
-	•	Role-based session validation (User vs Admin)
+The system follows a modular MVC-inspired structure:
+- Controllers handle request routing and business logic
+- Models manage database interactions via PDO
+- Views are rendered using PHP templates
+
+---
+
+## 🗄 Database Overview
+
+BitBalance uses a relational MySQL database designed with data integrity, scalability, and modularity in mind.  
+
+The schema enforces structured relationships through foreign key constraints and follows a normalized design to reduce redundancy.
+
+### 🔑 Core Entities
+
+- **user** – Stores account credentials, role (regular/admin), and profile information  
+- **userStatus** – Tracks account state, login attempts, and activity streaks  
+- **userGoal** – Stores daily calorie goals  
+- **intakeLog** – Records food intake entries and calorie values  
+- **weight_log** – Tracks user weight progress over time
+
+### 🔐 Security & Audit Tables
+
+- **login_attempts** – Tracks login activity and IP addresses  
+- **password_resets** – Secure token-based password recovery  
+- **activity_log** – Logs user actions for auditing  
+- **site_fees** – Configurable system fees  
+
+### 📊 Design Considerations
+
+- Foreign key constraints with cascading rules ensure referential integrity  
+- Unique constraints (e.g., user email) prevent duplication  
+- ENUM fields are used for controlled status values  
+- Indexed columns improve performance for frequent queries (login attempts, orders, forum interactions)  
+
+The database supports modular expansion and aligns with the application's multi-role architecture.
 
 
 # 🔐 Security Considerations
@@ -32,6 +75,9 @@ The application follows a structured backend approach:
 	•	Session-based access control
 	•	PDO prepared statements to prevent SQL injection
 	•	Basic input validation and sanitization
+    •	Server-side validation for all critical form inputs
+    •	Role-based access verification on protected routes
+    •	Prevention of direct URL access to admin-only pages
 
 # ✨ Features
 	•	User registration and login
