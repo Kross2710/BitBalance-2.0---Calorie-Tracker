@@ -66,6 +66,15 @@ The application follows a structured backend approach:
 
 3. **Configure Environment**
     - Edit `db_config.php` with your local database credentials.
+	- For Gemini AI in Dashboard Intake Usage, use your own API Key and create `include/secrets.php` with content as follows:
+	    
+	```bash
+	<?php
+	// Gemini API key (this should be kept secret in a real application, but is included here for demonstration purposes)
+	// Should be put in .env file in production
+	define('GEMINI_API_KEY', 'EXAMPLE_API_KEY');
+	?>
+    ```
 
 4. **Run Locally**
     - Place the project in your local web server’s directory (e.g. `htdocs` for XAMPP).
@@ -78,6 +87,10 @@ The application follows a structured backend approach:
 
 
 You can create your own account, the sign-up and sign-in processes are fully functional, and your password is securely hashed.
+
+Easy Admin:
+admin@gmail.com
+admin123
 
 ## Usage
 

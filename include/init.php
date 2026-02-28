@@ -26,6 +26,8 @@ $isLoggedIn = isset($_SESSION['user']);
 if ($isLoggedIn) {
     // Include the database configuration file
     require_once __DIR__ . '/db_config.php';
+    // Include the secrets file
+    require_once __DIR__ . '/secrets.php';
 
     // Check the user's status
     $stmt = $pdo->prepare("SELECT status FROM userStatus WHERE user_id = :user_id");
