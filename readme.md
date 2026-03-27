@@ -1,3 +1,7 @@
+# Quick Demo
+
+Check out the website [BitBalance](https://titan.csit.rmit.edu.au/~s3974781/bitbalance/dashboard/dashboard.php)
+
 # BitBalance – AI-Assisted Calorie Tracking Platform
 
 BitBalance is a modular full-stack web application designed to help users track daily calorie intake, manage nutrition goals, and monitor progress over time.
